@@ -62,7 +62,11 @@ namespace Stats
             identifyer.Identify();
 
             identifyer = new DataTypeIdentifyer(value3);
-            identifyer.Identify();
+            if (identifyer.Identify())
+            {
+                DiscreteAnalyser analyser = new DiscreteAnalyser();
+                analyser.Analyse(value3);
+            }
 
         }
     }

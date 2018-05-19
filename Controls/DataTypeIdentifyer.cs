@@ -29,8 +29,7 @@ namespace Stats.Controls
         //false - непрерывные
         public bool Identify()
         {
-            float[] unique = data.ToArray();
-            unique = data.Distinct().ToArray();
+            float[] unique = data.Distinct().ToArray();
 
             if ( (unique.Length/(float)data.Count) < (1 - criteria) )
             {
