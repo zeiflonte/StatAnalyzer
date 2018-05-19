@@ -68,6 +68,7 @@ namespace Stats
                 analyser.Analyse(value3);
             }
 
+            СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value1);
         }
     }
 }
