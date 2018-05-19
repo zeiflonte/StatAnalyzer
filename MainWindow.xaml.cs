@@ -1,6 +1,9 @@
 ﻿using Microsoft.Win32;
 using System.IO;
 using System.Windows;
+using Stats.Controls;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace Stats
 {
@@ -9,16 +12,20 @@ namespace Stats
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool[] isDiscret = new bool[3];
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        float[,] values = new float[360,3];
+        //float[,] values = new float[360,3];
+        List<float> value1 = new List<float>();
+        List<float> value2 = new List<float>();
+        List<float> value3 = new List<float>();
 
         private void butLoad_Click(object sender, RoutedEventArgs e)
         {
-            int i = 0;
             OpenFileDialog fileOpen = new OpenFileDialog
             {
                 Filter = "Text file (*.txt)|*.txt|All Files (*.*)|*.*",
@@ -33,18 +40,30 @@ namespace Stats
                     string data = stream.ReadToEnd();
                     {
                         string[] dataArray = data.Split('\n');
+                        CultureInfo ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+                        ci.NumberFormat.CurrencyDecimalSeparator = ".";
                         foreach (string entry in dataArray)
                         {
                             string[] entryArray = entry.Split(' ');
-                            float.TryParse(entryArray[0], out values[i,0]);
-                            float.TryParse(entryArray[1], out values[i,1]);
-                            float.TryParse(entryArray[2], out values[i,2]);
-                            i++;
+                            value1.Add(float.Parse(entryArray[0], NumberStyles.Any, ci));
+                            value2.Add(float.Parse(entryArray[1], NumberStyles.Any, ci));
+                            value3.Add(float.Parse(entryArray[2], NumberStyles.Any, ci));
                         }
                     }
                 }
                 fileOpen = null;
             }
+        }
+
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            DataTypeIdentifyer identifyer = new DataTypeIdentifyer(value1);
+            identifyer.Criteria = 0.5f;
+            identifyer.Identify();
+
+            identifyer = new DataTypeIdentifyer(value3);
+            identifyer.Identify();
+
         }
     }
 }

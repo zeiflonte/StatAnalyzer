@@ -11,3 +11,16 @@ D:\Study\ТВиМС\Stats\obj\Debug\Stats.Properties.Resources.resources
 D:\Study\ТВиМС\Stats\obj\Debug\Stats.csproj.GenerateResource.Cache
 D:\Study\ТВиМС\Stats\obj\Debug\Stats.exe
 D:\Study\ТВиМС\Stats\obj\Debug\Stats.pdb
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats.exe
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats.pdb
+C:\Users\User\Desktop\StatAnalyzer\bin\Debug\Stats.exe
+C:\Users\User\Desktop\StatAnalyzer\bin\Debug\Stats.pdb
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats.csprojResolveAssemblyReference.cache
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\MainWindow.g.cs
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\App.g.cs
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats_MarkupCompile.cache
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats_MarkupCompile.lref
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\MainWindow.baml
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats.g.resources
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats.Properties.Resources.resources
+C:\Users\User\Desktop\StatAnalyzer\obj\Debug\Stats.csproj.GenerateResource.Cache
