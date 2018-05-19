@@ -1,0 +1,13 @@
+D:\Study\ТВиМС\Stats\bin\Debug\Stats.exe
+D:\Study\ТВиМС\Stats\bin\Debug\Stats.pdb
+D:\Study\ТВиМС\Stats\obj\Debug\Stats.csprojResolveAssemblyReference.cache
+D:\Study\ТВиМС\Stats\obj\Debug\MainWindow.g.cs
+D:\Study\ТВиМС\Stats\obj\Debug\App.g.cs
+D:\Study\ТВиМС\Stats\obj\Debug\Stats_MarkupCompile.cache
+D:\Study\ТВиМС\Stats\obj\Debug\Stats_MarkupCompile.lref
+D:\Study\ТВиМС\Stats\obj\Debug\MainWindow.baml
+D:\Study\ТВиМС\Stats\obj\Debug\Stats.g.resources
+D:\Study\ТВиМС\Stats\obj\Debug\Stats.Properties.Resources.resources
+D:\Study\ТВиМС\Stats\obj\Debug\Stats.csproj.GenerateResource.Cache
+D:\Study\ТВиМС\Stats\obj\Debug\Stats.exe
+D:\Study\ТВиМС\Stats\obj\Debug\Stats.pdb
