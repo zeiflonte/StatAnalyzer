@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:Stats"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
+    <Grid Margin="0,0,0.4,-1.2">
+        <Canvas x:Name="jopa" Margin="0,111,0,0">
+            
+        </Canvas>
         <Button x:Name="butLoad" Content="Load file" HorizontalAlignment="Left" Margin="224,35,0,0" VerticalAlignment="Top" Width="75" Click="butLoad_Click"/>
         <Button x:Name="btnStart" Content="Обработать" Background="LightBlue" Margin="180,73,170.4,215.8" Click="btnStart_Click"></Button>
     </Grid>

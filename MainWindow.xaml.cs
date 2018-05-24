@@ -4,6 +4,7 @@ using System.Windows;
 using Stats.Controls;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows.Controls;
 
 namespace Stats
 {
@@ -64,11 +65,14 @@ namespace Stats
             identifyer = new DataTypeIdentifyer(value3);
             if (identifyer.Identify())
             {
-                DiscreteAnalyser analyser = new DiscreteAnalyser();
+                // Discrete
+                DiscreteAnalyser analyser = new DiscreteAnalyser(jopa);
                 analyser.Analyse(value3);
             }
-
-            СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value1);
+            else
+            {
+                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value1);
+            }
         }
     }
 }

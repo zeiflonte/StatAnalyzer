@@ -9,6 +9,18 @@ namespace Stats.Controls
 {
     class СontiguousAnalyzer
     {
+        private double xAverage;
+        double Average
+        {
+            get
+            {
+                return xAverage;
+            }
+            set
+            {
+                xAverage = value;
+            }
+        }
         private double h;
         double H
         {
@@ -76,6 +88,8 @@ namespace Stats.Controls
             public double endPoint;
             public double sumFrequencies;
             public double middle;
+            public double x;
+            public double f;
         }
         private List<intervalStruct> intervals = new List<intervalStruct>();
 
@@ -86,7 +100,7 @@ namespace Stats.Controls
             Mx = calculateMx();
             Dx = calculateDx();
 
-            Analyse();
+            Analyse(data);
         }
 
         double calculateH(List<float> data)
@@ -103,6 +117,8 @@ namespace Stats.Controls
             double end;
             double delta = 0.00001;
 
+            double amountOfVariants = data.Count;
+
             // Set up end value for the first iteration 
             end = data.Min();
             do
@@ -115,8 +131,10 @@ namespace Stats.Controls
                 interval.endPoint = end;
                 interval.middle = (start + end) / 2;
                 interval.sumFrequencies = data
-                    .Where(x => (x > start - delta || x > start + delta) &&
-                          (x < end - delta || x < end + delta)).Sum();
+                    .Count(x => (x > start - delta || x > start + delta) &&
+                          (x < end - delta || x < end + delta));
+                interval.x = (interval.endPoint - interval.startPoint) / 2;
+                interval.f = interval.sumFrequencies / (amountOfVariants * H);
 
                 intervals.Add(interval);
             } while (end < data.Max());
@@ -152,10 +170,72 @@ namespace Stats.Controls
             return Math.Sqrt(Dx);
         }
 
-        public void Analyse()
+        public void Analyse(List<float> data)
         {
             outputTable("output.txt");
+
+            if (NormalSpreadingCheck(data))
+            {
+                MessageBox.Show("Normal spreading");
+            }
         }
+
+        public bool NormalSpreadingCheck(List<float> data)
+        {
+            double As;
+            double Ex;
+
+            // Count xAverage
+            double numerator = 0; // числитель в xAverage
+            double denominator = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                numerator += interval.x * interval.f;
+                denominator += interval.f;
+            }
+            xAverage = numerator / denominator;
+
+            // Count nu3
+            double nu3;
+            int m = 3;
+            numerator = 0;
+            denominator = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                numerator += Math.Pow(interval.x - xAverage, m) * interval.f;
+                denominator += interval.f;
+            }
+            nu3 = numerator / denominator;
+
+            // Count As
+            double sigma3 = Dx * calculateSd();
+            As = nu3 / sigma3;
+
+            // Count nu4
+            double nu4;
+            m = 4;
+            numerator = 0;
+            denominator = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                numerator += Math.Pow(interval.x - xAverage, m) * interval.f;
+                denominator += interval.f;
+            }
+            nu4 = numerator / denominator;
+
+            // Count Ex
+            double sigma4 = Dx * Dx;
+            Ex = nu4 / sigma4 - 3;
+
+            // Compare with null
+            return CompareWithNull(As) && CompareWithNull(Ex);
+        }
+
+        bool CompareWithNull(double parameter)
+        {
+            return (parameter < 0.5 && parameter > -0.5);
+        }
+
 
         public void outputTable(string name)
         {

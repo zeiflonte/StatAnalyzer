@@ -36,3 +36,16 @@ D:\Study\ТВиМС\StatAnalyzer\obj\Debug\MainWindow.baml
 D:\Study\ТВиМС\StatAnalyzer\obj\Debug\Stats.g.resources
 D:\Study\ТВиМС\StatAnalyzer\obj\Debug\Stats.Properties.Resources.resources
 D:\Study\ТВиМС\StatAnalyzer\obj\Debug\Stats.csproj.GenerateResource.Cache
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats.exe
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats.pdb
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\bin\Debug\Stats.exe
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\bin\Debug\Stats.pdb
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats.csprojResolveAssemblyReference.cache
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\MainWindow.g.cs
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\App.g.cs
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats_MarkupCompile.cache
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats_MarkupCompile.lref
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\MainWindow.baml
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats.g.resources
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats.Properties.Resources.resources
+D:\Учёба\2 сем 2 курс\ТВиМС\StatAnalyzer\obj\Debug\Stats.csproj.GenerateResource.Cache
