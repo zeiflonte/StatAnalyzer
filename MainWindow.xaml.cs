@@ -62,16 +62,85 @@ namespace Stats
             identifyer.Criteria = 0.5f;
             identifyer.Identify();
 
-            identifyer = new DataTypeIdentifyer(value3);
+            identifyer = new DataTypeIdentifyer(value2);
             if (identifyer.Identify())
             {
                 // Discrete
-                DiscreteAnalyser analyser = new DiscreteAnalyser(jopa);
+                DiscreteAnalyser analyser = new DiscreteAnalyser(canvas);
                 analyser.Analyse(value3);
             }
             else
             {
-                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value1);
+                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value2);
+            }
+        }
+
+        private void btnClearData_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileOpen = new OpenFileDialog
+            {
+                Filter = "Text file (*.txt)|*.txt|All Files (*.*)|*.*",
+                RestoreDirectory = true,
+            };
+            if (fileOpen.ShowDialog() == true)
+            {
+                string fileName = fileOpen.FileName;
+                string[] parcedArray;
+
+                // Reading and processing raw data
+                using (StreamReader reader = new StreamReader(fileName))
+                {
+                    string data = reader.ReadToEnd();
+                    {
+                        string[] dataArray = data.Split('\n');
+                        parcedArray = new string[dataArray.Length / 5];
+                        int i = 1, // skip 1st entry
+                            j = 0;
+                        while (i < dataArray.Length)
+                        {
+                            // 2nd entry - add min temperature
+                            parcedArray[j] = dataArray[i];
+
+                            i += 2; // 3nd entry - just skip
+
+                            // 4nd entry - add max temperature
+                            parcedArray[j] += ' ' + dataArray[i];
+                            i++;
+
+                            //5th entry - add rainfall
+                            parcedArray[j] += ' ' + dataArray[i];
+
+                            i += 2; // 1nd entry - just skip
+
+                            // Next parcedArray entry
+                            j++;
+                        }
+                    }
+                }
+
+                // Writing raw data
+                SaveFileDialog fileSave = new SaveFileDialog
+                {
+                    Filter = "Text file (*.txt)|*.txt|All Files (*.*)|*.*",
+                    RestoreDirectory = true,
+                };
+                if (fileSave.ShowDialog() == true)
+                {
+                    fileName = fileSave.FileName;
+                    using (StreamWriter writer = new StreamWriter(fileName))
+                    {
+                        int i = 0;
+                        while (i < parcedArray.Length - 1)
+                        {
+                            writer.WriteLine(parcedArray[i]);
+                            i++;
+                        }
+                        // Avoiding a new line in the end of file
+                        writer.Write(parcedArray[i]);             
+                    }
+                    fileSave = null;
+                }
+                fileOpen = null;
             }
         }
     }

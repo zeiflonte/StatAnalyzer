@@ -7,10 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid Margin="0,0,0.4,-1.2">
-        <Canvas x:Name="jopa" Margin="0,111,0,0">
+        <Canvas x:Name="canvas" Margin="0,111,0,0">
             
         </Canvas>
         <Button x:Name="butLoad" Content="Load file" HorizontalAlignment="Left" Margin="224,35,0,0" VerticalAlignment="Top" Width="75" Click="butLoad_Click"/>
-        <Button x:Name="btnStart" Content="Обработать" Background="LightBlue" Margin="180,73,170.4,215.8" Click="btnStart_Click"></Button>
+        <Button x:Name="btnStart" Content="Process" Background="LightBlue" Margin="278,75,119.6,214.2" Click="btnStart_Click"></Button>
+        <Button x:Name="btnClearData" Content="Clear data" Background="LightBlue" Margin="125,75,273.6,214.2" Click="btnClearData_Click"/>
     </Grid>
 </Window>

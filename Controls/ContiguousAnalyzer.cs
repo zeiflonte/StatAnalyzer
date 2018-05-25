@@ -133,7 +133,7 @@ namespace Stats.Controls
                 interval.sumFrequencies = data
                     .Count(x => (x > start - delta || x > start + delta) &&
                           (x < end - delta || x < end + delta));
-                interval.x = (interval.endPoint - interval.startPoint) / 2;
+                interval.x = interval.middle;
                 interval.f = interval.sumFrequencies / (amountOfVariants * H);
 
                 intervals.Add(interval);
@@ -208,7 +208,7 @@ namespace Stats.Controls
             nu3 = numerator / denominator;
 
             // Count As
-            double sigma3 = Dx * calculateSd();
+            double sigma3 = Dx * Sd;
             As = nu3 / sigma3;
 
             // Count nu4
