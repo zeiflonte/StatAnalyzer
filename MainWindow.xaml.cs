@@ -71,7 +71,7 @@ namespace Stats
             }
             else
             {
-                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value2);
+                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value2, canvasContig);
             }
         }
 

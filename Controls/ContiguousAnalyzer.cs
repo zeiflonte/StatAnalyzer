@@ -4,11 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace Stats.Controls
 {
     class СontiguousAnalyzer
     {
+        Canvas canvas;
         private double xAverage;
         double Average
         {
@@ -86,20 +89,21 @@ namespace Stats.Controls
         {
             public double startPoint;
             public double endPoint;
-            public double sumFrequencies;
+            public int sumFrequencies;
             public double middle;
             public double x;
             public double f;
         }
         private List<intervalStruct> intervals = new List<intervalStruct>();
 
-        public СontiguousAnalyzer(List<float> data)
+        public СontiguousAnalyzer(List<float> data, Canvas canvas)
         {
             H = calculateH(data);
             getIntervals(data);
             Mx = calculateMx();
             Dx = calculateDx();
 
+            this.canvas = canvas;
             Analyse(data);
         }
 
@@ -170,8 +174,39 @@ namespace Stats.Controls
             return Math.Sqrt(Dx);
         }
 
+        private void draw()
+        {
+           // int offsetX = (int)canvas.ActualHeight;
+            int offsetY = (int)canvas.ActualHeight * 2 / 3;
+            int offset = 24;
+            //int X1 = 0;
+            //int Y1 = (int)canvas.ActualHeight;
+            int X2 = 0;
+            int Y2 = offsetY;
+            foreach (intervalStruct interval in intervals)
+            {
+                Line line = new Line();
+                line.X1 = X2;
+                line.Y1 = Y2;
+
+                X2 += offset;
+                Y2 = offsetY - interval.sumFrequencies * 2; //!!!!!!
+                
+                line.X2 = X2;
+                line.Y2 = Y2;
+
+                line.VerticalAlignment = VerticalAlignment.Top;
+                line.StrokeThickness = 1;
+                line.Stroke = System.Windows.Media.Brushes.Green;
+                canvas.Children.Add(line);
+            }
+
+        }
+
         public void Analyse(List<float> data)
         {
+            draw();
+
             outputTable("output.txt");
 
             if (NormalSpreadingCheck(data))
