@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,8 +10,19 @@ using System.Windows.Shapes;
 
 namespace Stats.Controls
 {
+    class intervalStruct
+    {
+        public double startPoint;
+        public double endPoint;
+        public int sumFrequencies;
+        public double theorFrequencies;
+        public double middle;
+        public double x;
+        public double f;
+    }
     class СontiguousAnalyzer
     {
+        static double[] fiTable = new double[401];
         Canvas canvas;
         private double xAverage;
         double Average
@@ -85,15 +97,6 @@ namespace Stats.Controls
             }
         }
 
-        struct intervalStruct
-        {
-            public double startPoint;
-            public double endPoint;
-            public int sumFrequencies;
-            public double middle;
-            public double x;
-            public double f;
-        }
         private List<intervalStruct> intervals = new List<intervalStruct>();
 
         public СontiguousAnalyzer(List<float> data, Canvas canvas)
@@ -102,6 +105,7 @@ namespace Stats.Controls
             getIntervals(data);
             Mx = calculateMx();
             Dx = calculateDx();
+            Sd = calculateSd();
 
             this.canvas = canvas;
             Analyse(data);
@@ -211,8 +215,11 @@ namespace Stats.Controls
 
             if (NormalSpreadingCheck(data))
             {
-                MessageBox.Show("Normal spreading");
+                MessageBox.Show("Normal distribution");
             }
+
+            CountFrequencies(data);
+            CompareCriticalValues(CountX2obs(), CountX2da());
         }
 
         public bool NormalSpreadingCheck(List<float> data)
@@ -271,6 +278,75 @@ namespace Stats.Controls
             return (parameter < 0.5 && parameter > -0.5);
         }
 
+        void CountFrequencies(List<float> data)
+        {
+            //string output = "";
+            foreach (intervalStruct interval in intervals)
+            {
+                double t = (interval.x - xAverage) / Sd;
+                //output += t.ToString() + "\n";
+                int index = (int)Math.Abs(Math.Round(t * 100));
+                double fi = fiTable[index];
+                interval.theorFrequencies = data.Count * H * fi / Sd;
+            }
+            //MessageBox.Show(output);
+        }
+
+        double CountX2obs()
+        {
+            double sum = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                sum += Math.Pow(interval.sumFrequencies - interval.theorFrequencies, 2) / interval.theorFrequencies;
+            }
+            return sum;
+        }
+
+        double CountX2da()
+        {
+            // alpha = 0.05;
+            int r = 2; // amount of parameters for normal distribution
+            int d = intervals.Count - r - 1;
+            double criticalValue = CriticalValueParser.criticalValuesTable[d - 1];
+            return criticalValue;
+        }
+
+        void CompareCriticalValues(double X2obs, double X2da)
+        {
+            string message;
+            if (X2obs > X2da)
+            {
+                message = "Hypothesis has been denied";
+            }
+            else
+            {
+                message = "Hypothesis has been accepted";
+            }
+            MessageBox.Show(message);
+        }
+
+        public static void ParseFiTable()
+        {
+            string fileName = "../../fi";
+
+            using (StreamReader reader = new StreamReader(fileName))
+            {
+                string data = reader.ReadToEnd();
+                {
+                    string[] cells = data.Split('\t');
+                    int i = 0;
+                    CultureInfo ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+                    ci.NumberFormat.CurrencyDecimalSeparator = ".";
+                    foreach (string entry in cells)
+                    {
+                        string convertedString = "0." + entry;
+                        double convertedFloat = double.Parse(convertedString, NumberStyles.Any, ci);
+                        fiTable[i] = convertedFloat;
+                        i++;
+                    }
+                }
+            }
+        }
 
         public void outputTable(string name)
         {

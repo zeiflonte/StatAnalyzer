@@ -63,6 +63,7 @@ namespace Stats
             identifyer.Identify();
 
             identifyer = new DataTypeIdentifyer(value2);
+            CriticalValueParser.ParseCriticalValueTable();
             if (identifyer.Identify())
             {
                 // Discrete
@@ -71,6 +72,7 @@ namespace Stats
             }
             else
             {
+                СontiguousAnalyzer.ParseFiTable();
                 СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value2, canvasContig);
             }
         }

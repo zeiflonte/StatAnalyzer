@@ -62,6 +62,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\ContiguousAnalyzer.cs" />
+    <Compile Include="Controls\CriticalValueParser.cs" />
     <Compile Include="Controls\DataTypeIdentifyer.cs" />
     <Compile Include="Controls\DiscreteAnalyser.cs" />
     <Compile Include="MainWindow.xaml.cs">
