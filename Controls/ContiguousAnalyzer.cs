@@ -213,16 +213,80 @@ namespace Stats.Controls
 
             outputTable("output.txt");
 
-            if (NormalSpreadingCheck(data))
+            DispersionMultiplication();
+
+            // Normal distribution check
+
+            if (NormalDistributionCheck(data))
             {
                 MessageBox.Show("Normal distribution");
             }
 
             CountFrequencies(data);
-            CompareCriticalValues(CountX2obs(), CountX2da());
+            int d = CountDegreesOfFreedom();
+            string message;
+            double X2obs = CountX2obs();
+            message = ComparePirson(X2obs, CountX2da(d)) + "\n";
+            message += CompareRomanovsky(X2obs, d) + "\n";
+            message += CompareYastremsky(X2obs, d);
+            MessageBox.Show(message, "Normal distribution");
         }
 
-        public bool NormalSpreadingCheck(List<float> data)
+        void DispersionMultiplication()
+        {
+            double DxCommon = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                DxCommon += Math.Pow(interval.x - xAverage, 2);
+            }
+            DxCommon /= intervals.Count;
+
+            double GroupDispersionAverage;
+            double numenator = 0;
+            double denominator = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                numenator += Sd * interval.f;
+                denominator += interval.f;
+            }
+            GroupDispersionAverage = numenator / denominator;
+
+            double InterGroupDispersion;
+            numenator = 0;
+            denominator = 0;
+            foreach (intervalStruct interval in intervals)
+            {
+                numenator += Math.Pow(interval.x - xAverage, 2) * interval.f;
+                denominator += interval.f;
+            }
+            InterGroupDispersion = numenator / denominator;
+
+            if (CompareDispersionMultiplication(DxCommon, GroupDispersionAverage, InterGroupDispersion))
+            {
+                MessageBox.Show("Dispersions multiplication theorem: HIGH quality");
+            }
+            else
+            {
+                MessageBox.Show("Dispersions multiplication theorem: LOW quality");
+            }
+
+            //MessageBox.Show(DxCommon.ToString() + " = " + GroupDispersionAverage.ToString() + " + " + InterGroupDispersion.ToString());
+        }
+
+        bool CompareDispersionMultiplication(double DxCommon, double GroupDispersionAverage, double InterGroupDispersion)
+        {
+            if (GroupDispersionAverage + InterGroupDispersion > 0.9 * DxCommon &&
+                GroupDispersionAverage + InterGroupDispersion < 1.1 * DxCommon)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool NormalDistributionCheck(List<float> data)
         {
             double As;
             double Ex;
@@ -292,6 +356,13 @@ namespace Stats.Controls
             //MessageBox.Show(output);
         }
 
+        int CountDegreesOfFreedom()
+        {
+            int r = 2; // amount of parameters for normal distribution
+            int d = intervals.Count - r - 1;
+            return d;
+        }
+
         double CountX2obs()
         {
             double sum = 0;
@@ -302,27 +373,55 @@ namespace Stats.Controls
             return sum;
         }
 
-        double CountX2da()
+        double CountX2da(int d)
         {
             // alpha = 0.05;
-            int r = 2; // amount of parameters for normal distribution
-            int d = intervals.Count - r - 1;
             double criticalValue = CriticalValueParser.criticalValuesTable[d - 1];
             return criticalValue;
         }
 
-        void CompareCriticalValues(double X2obs, double X2da)
+        string ComparePirson(double X2obs, double X2da)
         {
             string message;
             if (X2obs > X2da)
             {
-                message = "Hypothesis has been denied";
+                message = "Pirson: Hypothesis has been denied";
             }
             else
             {
-                message = "Hypothesis has been accepted";
+                message = "Pirson: Hypothesis has been accepted";
             }
-            MessageBox.Show(message);
+            return message;
+        }
+
+        string CompareRomanovsky(double X2obs, int d)
+        {
+            string message;
+            double R = Math.Abs(X2obs - d) / Math.Sqrt(2 * d);
+            if (R >= 3)
+            {
+                message = "Romanovsky: Hypothesis has been denied";
+            }
+            else
+            {
+                message = "Romanovsky: Hypothesis has been accepted";
+            }
+            return message;
+        }
+
+        string CompareYastremsky(double X2obs, int d)
+        {
+            string message;
+            double J = Math.Abs(X2obs - d) / Math.Sqrt(2 * intervals.Count + 2.4);
+            if (J >= 3)
+            {
+                message = "Yastremsky: Hypothesis has been denied";
+            }
+            else
+            {
+                message = "Yastremsky: Hypothesis has been accepted";
+            }
+            return message;
         }
 
         public static void ParseFiTable()
