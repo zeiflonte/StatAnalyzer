@@ -5,12 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Stats"
         mc:Ignorable="d"
-        Title="MainWindow" Height="542.692" Width="525">
+        Title="StatAnalyzer" Height="740.025" Width="1348.5">
     <Grid Margin="0,0,0.4,-1.2">
-        <Canvas x:Name="canvas" Margin="0,146,-0.4,183.2" Background="#FFE2F3E3"/>
-        <Button x:Name="butLoad" Content="Load file" HorizontalAlignment="Left" Margin="223,36,0,0" VerticalAlignment="Top" Width="75" Click="butLoad_Click"/>
-        <Button x:Name="btnStart" Content="Process" HorizontalAlignment="Left" Background="LightBlue" Margin="323,76,0,406.2" Width="75" Click="btnStart_Click"></Button>
-        <Button x:Name="btnClearData" Content="Clear data" HorizontalAlignment="Left" Background="LightBlue" Margin="124,76,0,406.2" Width="75" Click="btnClearData_Click"/>
-        <Canvas x:Name="canvasContig" Margin="0,330,-0.4,0.2" Background="#FFFFDCDC"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="431*"/>
+            <RowDefinition Height="269*"/>
+        </Grid.RowDefinitions>
+        <Canvas x:Name="canvas" Margin="526,85,295.6,160" Background="#FFE2F3E3" Height="185"/>
+        <Button x:Name="butLoad" Content="Load file" HorizontalAlignment="Left" Margin="31,19,0,0" VerticalAlignment="Top" Width="75" Click="butLoad_Click" Height="25"/>
+        <Button x:Name="btnStart" Content="Process" HorizontalAlignment="Left" Background="LightBlue" Margin="251,19,0,388" Width="75" Click="btnStart_Click"/>
+        <Button x:Name="btnClearData" Content="Clear data" HorizontalAlignment="Left" Background="LightBlue" Margin="142,19,0,388" Width="74" Click="btnClearData_Click"/>
+        <Canvas x:Name="canvasContig" Margin="526,293,294.6,221" Background="#FFFFDCDC" Height="185" Grid.RowSpan="2"/>
+        <Canvas x:Name="canvasContig2" Margin="526,70,294.6,18" Background="#FFFFDCDC" Height="185" Grid.Row="1"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Height="18" Margin="10,66,0,0" TextWrapping="Wrap" Text="F(x) Rainfall amount:" VerticalAlignment="Top" Width="180"/>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Height="18" Margin="10,278,0,0" TextWrapping="Wrap" Text="F(x) Min temperatures:" VerticalAlignment="Top" Width="180"/>
+        <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Height="18" Margin="10,52,0,0" TextWrapping="Wrap" Text="F(x) Max temperatures:" VerticalAlignment="Top" Width="180" Grid.Row="1"/>
+        <TabControl x:Name="tabControl1" Margin="1060,298,9.6,203" Grid.RowSpan="2">
+            <TabItem Header="Normal">
+                <Grid Background="#FFE5E5E5" Margin="0,0,0,2">
+                    <TextBox x:Name="results1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="No results" Width="264" VerticalScrollBarVisibility="Visible"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Uniform">
+                <Grid Background="#FFE5E5E5" Margin="0,0,0,1">
+                    <TextBox x:Name="results12" HorizontalAlignment="Left" TextWrapping="Wrap" Text="No results" Width="264" VerticalScrollBarVisibility="Visible"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Canvas x:Name="funcCanvas" Margin="0,84,820.6,161" Background="#FFE2F3E3" Height="185"/>
+        <Canvas x:Name="funcCanvasContig" Margin="0,293,820.6,221" Background="#FFFFDCDC" Height="185" Grid.RowSpan="2"/>
+        <Canvas x:Name="funcCanvasContig2" Margin="0,70,820.6,18" Background="#FFFFDCDC" Height="185" Grid.Row="1"/>
+        <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Height="18" Margin="536,66,0,0" TextWrapping="Wrap" Text="Rainfall amount:" VerticalAlignment="Top" Width="180"/>
+        <TextBlock x:Name="textBlock_Copy3" HorizontalAlignment="Left" Height="18" Margin="536,278,0,0" TextWrapping="Wrap" Text="Min temperatures:" VerticalAlignment="Top" Width="180"/>
+        <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Height="18" Margin="536,51,0,0" TextWrapping="Wrap" Text="Max temperatures:" VerticalAlignment="Top" Width="180" Grid.Row="1"/>
+        <TabControl x:Name="tabControl2" Margin="1060,74,8.6,10" Grid.Row="1">
+            <TabItem Header="Normal">
+                <Grid Background="#FFE5E5E5" Margin="0,0,0,11">
+                    <TextBox x:Name="results2" HorizontalAlignment="Left" TextWrapping="Wrap" Text="No results" Width="263" Margin="0,0,0,-11" VerticalScrollBarVisibility="Visible"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Uniform">
+                <Grid Background="#FFE5E5E5">
+                    <TextBox x:Name="results22" HorizontalAlignment="Left" TextWrapping="Wrap" Text="No results" Width="263" VerticalScrollBarVisibility="Visible"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <TabControl x:Name="tabControl3" Margin="1058,85,9.6,144">
+            <TabItem Header="Puasson">
+                <Grid Background="#FFE5E5E5" Margin="0,0,0,-1">
+                    <TextBox x:Name="results3" HorizontalAlignment="Left" Height="181" TextWrapping="Wrap" Text="No results" VerticalAlignment="Top" Width="266" VerticalScrollBarVisibility="Visible"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

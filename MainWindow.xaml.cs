@@ -56,25 +56,32 @@ namespace Stats
             }
         }
 
-        private void btnStart_Click(object sender, RoutedEventArgs e)
+        private void Initialize(List<float> value, Canvas canvas, Canvas funcCanvas, TextBox results, string distribution)
         {
-            DataTypeIdentifyer identifyer = new DataTypeIdentifyer(value1);
+            DataTypeIdentifyer identifyer = new DataTypeIdentifyer(value);
             identifyer.Criteria = 0.5f;
-            identifyer.Identify();
 
-            identifyer = new DataTypeIdentifyer(value2);
             CriticalValueParser.ParseCriticalValueTable();
             if (identifyer.Identify())
             {
                 // Discrete
-                DiscreteAnalyser analyser = new DiscreteAnalyser(canvas);
-                analyser.Analyse(value3);
+                DiscreteAnalyser analyser = new DiscreteAnalyser(canvas, funcCanvas);
+                analyser.Analyse(value, results);
             }
             else
             {
                 СontiguousAnalyzer.ParseFiTable();
-                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value2, canvasContig);
+                СontiguousAnalyzer contiguousAnalyzer = new СontiguousAnalyzer(value, canvas, funcCanvas, results, distribution);
             }
+        }
+
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            Initialize(value1, canvasContig, funcCanvasContig, results1, "normal");
+            Initialize(value1, canvasContig, funcCanvasContig, results12, "uniform");
+            Initialize(value2, canvasContig2, funcCanvasContig2, results2, "normal");
+            Initialize(value2, canvasContig2, funcCanvasContig2, results22, "uniform");
+            Initialize(value3, canvas, funcCanvas, results3, "");
         }
 
         private void btnClearData_Click(object sender, RoutedEventArgs e)

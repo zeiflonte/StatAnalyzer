@@ -10,10 +10,35 @@ using Stats;
 
 namespace Stats.Controls
 {
+    class intervalDiscrete
+    {
+        public double startPoint;
+        public double endPoint;
+        public double sumFrequencies;
+        public int countFrequencies;
+        public int frequency;
+        public double theorFrequencies;
+        public double middle;
+        public double x;
+        public double f;
+    }
+
     class StatisticValue
     {
-        private float value;
-        public float Value
+        private double value;
+        private double theorFrequencies;
+        public double TheorFrequencies
+        {
+            get
+            {
+                return theorFrequencies;
+            }
+            set
+            {
+                theorFrequencies = value;
+            }
+        }
+        public double Value
         {
             get
             {
@@ -24,8 +49,8 @@ namespace Stats.Controls
                 this.value = value;
             }
         }
-        private float frequency;
-        public float Frequency
+        private double frequency;
+        public double Frequency
         {
             get
             {
@@ -37,7 +62,7 @@ namespace Stats.Controls
             }
         }
 
-        public StatisticValue(float val, float freq)
+        public StatisticValue(double val, double freq)
         {
             this.value = val;
             this.frequency = freq;
@@ -48,7 +73,10 @@ namespace Stats.Controls
 
     class DiscreteAnalyser
     {
+        private List<intervalDiscrete> intervals = new List<intervalDiscrete>();
+        double H;
         Canvas field;
+        Canvas funcCanvas;
         double AverageX;
         double Average
         {
@@ -63,9 +91,10 @@ namespace Stats.Controls
         }
 
 
-        public DiscreteAnalyser(Canvas c)
+        public DiscreteAnalyser(Canvas c, Canvas funcCanvas)
         {
             field = c;
+            this.funcCanvas = funcCanvas;
         }
 
 
@@ -77,17 +106,41 @@ namespace Stats.Controls
             foreach (StatisticValue value in table)
             {
                 Ellipse el = new Ellipse();
-                el.Width = 10;
-                el.Height = 10;
+                el.Width = 5;
+                el.Height = 5;
                 el.VerticalAlignment = VerticalAlignment.Top;
                 el.StrokeThickness = 3;
                 el.Stroke = System.Windows.Media.Brushes.Green;
                 canvas.Children.Add(el);
                 Canvas.SetLeft(el, value.Value + offset);
                 Canvas.SetTop(el,(startPoint - value.Frequency*100));
-                offset += 20;
+                offset += 5;
             }
+        }
 
+        private void drawFunction(Canvas canvas, StatisticValue[] table)
+        {
+            int offsetY = (int)canvas.ActualHeight * 2 / 3;
+            int offset = 6;
+            int X2 = 0;
+            int Y2 = offsetY;
+            foreach (StatisticValue value in table)
+            {
+                Line line = new Line();
+                line.X1 = X2;
+                line.Y1 = Y2;
+
+                X2 += offset;
+                Y2 = offsetY - (int)(value.Value) * 2;
+
+                line.X2 = X2;
+                line.Y2 = Y2;
+
+                line.VerticalAlignment = VerticalAlignment.Top;
+                line.StrokeThickness = 1;
+                line.Stroke = System.Windows.Media.Brushes.Green;
+                canvas.Children.Add(line);
+            }
         }
 
         double CalculateAverage(List<float> table)
@@ -147,7 +200,7 @@ namespace Stats.Controls
         }*/
 
 
-        public void Analyse(List<float> data)
+        public void Analyse(List<float> data, TextBox results)
         {
             float Mx_real = data.Sum() / data.Count;
             float Dx_real = calculateDx(Mx_real, data);
@@ -166,26 +219,188 @@ namespace Stats.Controls
             }
 
             draw(field, table);
+            drawFunction(funcCanvas, table);
 
-            if (PyassonCheck(table, data))
+            string message = "";
+
+            if (PyassonCheck(table, data, ref message))
             {
-                MessageBox.Show("Puasson spreading");
+                MessageBox.Show("It is the puasson distribution");
+            }
+            else
+            {
+                MessageBox.Show("Primary checking on the puasson distribution: false");
             }
 
-            outputTable("output.txt", table);
+            outputTable("../../discrete.txt", table);
+            
+            H = getH(data);
+            getIntervals(data, table);
+           // CountTheorFrequencies();
+
+            int d = CountDegreesOfFreedom();
+            double X2obs = CountX2obs();
+            message += "Mx = " + Mx_real + "; " + "Dx = " + Dx_real + "; " + "Sd = " + Math.Sqrt(Dx_real) + "\n";
+            message += ComparePirson(X2obs, CountX2da(d)) + "\n";
+            message += CompareRomanovsky(X2obs, d) + "\n";
+            message += CompareYastremsky(X2obs, d, table);
+
+            results.Text = message;
         }
 
-       // void Find
+        public int factorial(int number)
+        {
+            if (number == 0)
+            {
+                number = 1;
+            }
+            int result = 1;
+            while (number != 1)
+            {
+                result = result * number;
+                number = number - 1;
+            }
+            return result;
+        }
 
-        bool PyassonCheck(StatisticValue[] table, List<float> data)
+        double getH(List<float> data)
+        {
+            double maxValue = data.Max();
+            double minValue = data.Min();
+            double H = (maxValue - minValue) / (1 + 3.322 * Math.Log(data.Count));
+            H = 17;
+            return H;
+        }
+
+        void getIntervals(List<float> data, StatisticValue[] table)
+        {
+            double start;
+            double end;
+            // double delta = 0.00001;
+
+            double amountOfVariants = data.Count;
+            string mes = "";
+            // Set up end value for the first iteration 
+            end = (int)Math.Round(data.Min());
+
+            do
+            {
+                start = end;
+                end = start + (int)Math.Round(H);
+
+                intervalDiscrete interval = new intervalDiscrete();
+                interval.startPoint = start;
+                interval.endPoint = end;
+                interval.middle = (start + end) / 2;
+
+                StatisticValue[] arr = Array.FindAll(table, x => (x.Value >= start) && (x.Value < end));
+                interval.sumFrequencies = arr.Sum(x => x.Frequency);
+                interval.frequency = arr.Count();
+                interval.theorFrequencies = arr.Count() * Math.Pow(AverageX, interval.x) * Math.Pow(Math.E, -AverageX) /factorial((int)Math.Round(interval.x));
+                /* interval.countFrequencies = data
+                    .Count(x => (x > start - delta || x > start + delta) &&
+                          (x < end - delta || x < end + delta)); */
+
+                interval.x = interval.middle;
+                interval.f = interval.sumFrequencies / (amountOfVariants * H);
+                mes += /*interval.startPoint + " - " + interval.endPoint + " " +*/ interval.frequency + " " + interval.sumFrequencies + "\n";
+                intervals.Add(interval);
+            } while (end < data.Max());
+            //MessageBox.Show(mes);
+        }     
+
+        void CountTheorFrequencies()
+        {
+            string output = "";
+            foreach (intervalDiscrete interval in intervals)
+            {
+                //interval.theorFrequencies = intervals.Count() * (Math.Pow(AverageX, interval.x) / (factorial((int)(Math.Round(interval.x))) * Math.Pow(Math.E, -AverageX)));
+                interval.theorFrequencies = Math.Pow(interval.sumFrequencies, 2);
+                output += interval.theorFrequencies.ToString() + "\n";
+            }
+            //MessageBox.Show(output);
+        }
+
+        int CountDegreesOfFreedom()
+        {
+            int r = 1; // amount of parameters for puasson distribution
+            int d = intervals.Count() - r - 1;
+            return d;
+        }
+
+        double CountX2obs()
+        {
+            double sum = 0;
+            foreach (intervalDiscrete interval in intervals)
+            {
+                if (interval.theorFrequencies != 0)
+                sum += Math.Pow(interval.sumFrequencies - interval.theorFrequencies, 2) / interval.theorFrequencies;
+            }
+            return sum;
+        }
+
+        double CountX2da(int d)
+        {
+            // alpha = 0.05;
+            double criticalValue = CriticalValueParser.criticalValuesTable[d - 1];
+            return criticalValue;
+        }
+
+        string ComparePirson(double X2obs, double X2da)
+        {
+            string message;
+            if (X2obs > X2da)
+            {
+                message = "Pirson: Hypothesis has been denied";
+            }
+            else
+            {
+                message = "Pirson: Hypothesis has been accepted";
+            }
+            message += "\nX2obs = " + X2obs + "; " + "X2da = " + X2da;
+            return message;
+        }
+
+        string CompareRomanovsky(double X2obs, int d)
+        {
+            string message;
+            double R = Math.Abs(X2obs - d) / Math.Sqrt(2 * d);
+            if (R >= 3)
+            {
+                message = "Romanovsky: Hypothesis has been denied";
+            }
+            else
+            {
+                message = "Romanovsky: Hypothesis has been accepted";
+            }
+            message += "\nR = " + R;
+            return message;
+        }
+
+        string CompareYastremsky(double X2obs, int d, StatisticValue[] table)
+        {
+            string message;
+            double J = Math.Abs(X2obs - d) / Math.Sqrt(2 * table.Count() + 2.4);
+            if (J >= 3)
+            {
+                message = "Yastremsky: Hypothesis has been denied";
+            }
+            else
+            {
+                message = "Yastremsky: Hypothesis has been accepted";
+            }
+            message += "\nJ = " + J;
+            return message;
+        }
+
+        bool PyassonCheck(StatisticValue[] table, List<float> data, ref string message)
         {
             double delta = 0.1;
             double Sv = SampleVariance(table, data.Count);
             double Xv = calculateXv(ref table, data.Count);
-
+            message += "Sv = " + Sv + "; Xv = " + Xv + "\n";
             return (Sv * (1 - delta) < Xv && Xv < Sv * (1 + delta));
-        }
-
+        }  
 
         double calculateXv(ref StatisticValue[] table, int n)
         {
@@ -197,15 +412,6 @@ namespace Stats.Controls
 
             return numerator / (float)n;
         }
-        /*double AverageArifmethikValue()
-        {
-          double numerator = 0;
-
-          foreach (intervalStruct interval in intervals)
-          {
-              numerator += 
-          }
-        }*/
 
         double SampleVariance(StatisticValue[] table ,int n)
         {

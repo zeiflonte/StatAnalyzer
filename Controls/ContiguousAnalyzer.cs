@@ -24,6 +24,7 @@ namespace Stats.Controls
     {
         static double[] fiTable = new double[401];
         Canvas canvas;
+        Canvas funcCanvas;
         private double xAverage;
         double Average
         {
@@ -99,7 +100,7 @@ namespace Stats.Controls
 
         private List<intervalStruct> intervals = new List<intervalStruct>();
 
-        public СontiguousAnalyzer(List<float> data, Canvas canvas)
+        public СontiguousAnalyzer(List<float> data, Canvas canvas, Canvas funcCanvas, TextBox results, string distribution)
         {
             H = calculateH(data);
             getIntervals(data);
@@ -108,7 +109,8 @@ namespace Stats.Controls
             Sd = calculateSd();
 
             this.canvas = canvas;
-            Analyse(data);
+            this.funcCanvas = funcCanvas;
+            Analyse(data, results, distribution);
         }
 
         double calculateH(List<float> data)
@@ -178,7 +180,7 @@ namespace Stats.Controls
             return Math.Sqrt(Dx);
         }
 
-        private void draw()
+        private void draw(Canvas canvas)
         {
            // int offsetX = (int)canvas.ActualHeight;
             int offsetY = (int)canvas.ActualHeight * 2 / 3;
@@ -194,7 +196,7 @@ namespace Stats.Controls
                 line.Y1 = Y2;
 
                 X2 += offset;
-                Y2 = offsetY - interval.sumFrequencies * 2; //!!!!!!
+                Y2 = offsetY - interval.sumFrequencies * 2;
                 
                 line.X2 = X2;
                 line.Y2 = Y2;
@@ -207,32 +209,70 @@ namespace Stats.Controls
 
         }
 
-        public void Analyse(List<float> data)
+        private void drawFunction(Canvas canvas)
         {
-            draw();
+            // int offsetX = (int)canvas.ActualHeight;
+            int offsetY = (int)canvas.ActualHeight * 2 / 3;
+            int offset = 24;
+            //int X1 = 0;
+            //int Y1 = (int)canvas.ActualHeight;
+            int X2 = 0;
+            int Y2 = offsetY;
+            foreach (intervalStruct interval in intervals)
+            {
+                Line line = new Line();
+                line.X1 = X2;
+                line.Y1 = Y2;
 
-            outputTable("output.txt");
+                X2 += offset;
+                Y2 = offsetY - (int)interval.x * 2;
 
-            DispersionMultiplication();
+                line.X2 = X2;
+                line.Y2 = Y2;
+
+                line.VerticalAlignment = VerticalAlignment.Top;
+                line.StrokeThickness = 1;
+                line.Stroke = System.Windows.Media.Brushes.Green;
+                canvas.Children.Add(line);
+            }
+
+        }
+
+        public void Analyse(List<float> data, TextBox results, string distribution)
+        {
+            string message = "";
+            draw(canvas);
+            drawFunction(funcCanvas);
+
+            outputTable("../../contiguous.txt");
+
+            message += DispersionMultiplication();
 
             // Normal distribution check
 
-            if (NormalDistributionCheck(data))
+            if (distribution == "normal")
+            if (NormalDistributionCheck(data, ref message))
             {
                 MessageBox.Show("Normal distribution");
             }
+            else
+            {
+                MessageBox.Show("Primary checking on the Normal distribution: false");
+            }
 
-            CountFrequencies(data);
+            CountFrequencies(data, distribution);
             int d = CountDegreesOfFreedom();
-            string message;
             double X2obs = CountX2obs();
-            message = ComparePirson(X2obs, CountX2da(d)) + "\n";
+            message += "Mx = " + Mx + "; " + "Dx = " + Dx + "; " + "Sd = " + Sd + "\n";
+            message += ComparePirson(X2obs, CountX2da(d)) + "\n";
             message += CompareRomanovsky(X2obs, d) + "\n";
             message += CompareYastremsky(X2obs, d);
-            MessageBox.Show(message, "Normal distribution");
+            // MessageBox.Show(message, "Normal distribution");
+            //Clipboard.SetText(message);
+            results.Text = message;
         }
 
-        void DispersionMultiplication()
+        string DispersionMultiplication()
         {
             double DxCommon = 0;
             foreach (intervalStruct interval in intervals)
@@ -263,20 +303,28 @@ namespace Stats.Controls
 
             if (CompareDispersionMultiplication(DxCommon, GroupDispersionAverage, InterGroupDispersion))
             {
-                MessageBox.Show("Dispersions multiplication theorem: HIGH quality");
+                return "Dispersions multiplication theorem: HIGH quality\n(" + InterGroupDispersion.ToString() 
+                    + " / " + DxCommon.ToString() + " = " + (InterGroupDispersion
+                    / DxCommon).ToString() + " (> 0.6)" + ")\n";
             }
             else
             {
-                MessageBox.Show("Dispersions multiplication theorem: LOW quality");
+                //return "Dispersions multiplication theorem: LOW quality\n(" + DxCommon.ToString() + " != " 
+                //    + GroupDispersionAverage.ToString() + " + " + InterGroupDispersion.ToString() + ")\n";
+                return "Dispersions multiplication theorem: LOW quality\n(" + InterGroupDispersion.ToString()
+                    + " / " + DxCommon.ToString() + " = " + (InterGroupDispersion
+                    / DxCommon).ToString() + " (< 0.6)" + ")\n";
             }
 
-            //MessageBox.Show(DxCommon.ToString() + " = " + GroupDispersionAverage.ToString() + " + " + InterGroupDispersion.ToString());
+            //MessageBox.Show(DxCommon.ToString() + " = " + GroupDispersionAverage.ToString() + " + " 
+            //+ InterGroupDispersion.ToString());
         }
 
-        bool CompareDispersionMultiplication(double DxCommon, double GroupDispersionAverage, double InterGroupDispersion)
+        bool CompareDispersionMultiplication(double DxCommon, double GroupDispersionAverage, 
+            double InterGroupDispersion)
         {
-            if (GroupDispersionAverage + InterGroupDispersion > 0.9 * DxCommon &&
-                GroupDispersionAverage + InterGroupDispersion < 1.1 * DxCommon)
+            if (InterGroupDispersion / DxCommon > 0.6 &&
+                InterGroupDispersion / DxCommon < 1)
             {
                 return true;
             }
@@ -286,7 +334,7 @@ namespace Stats.Controls
             }
         }
 
-        public bool NormalDistributionCheck(List<float> data)
+        public bool NormalDistributionCheck(List<float> data, ref string message)
         {
             double As;
             double Ex;
@@ -333,6 +381,8 @@ namespace Stats.Controls
             double sigma4 = Dx * Dx;
             Ex = nu4 / sigma4 - 3;
 
+            message += "As = " + As + "; Ex = " + Ex; 
+
             // Compare with null
             return CompareWithNull(As) && CompareWithNull(Ex);
         }
@@ -342,18 +392,28 @@ namespace Stats.Controls
             return (parameter < 0.5 && parameter > -0.5);
         }
 
-        void CountFrequencies(List<float> data)
+        void CountFrequencies(List<float> data, string distribution)
         {
-            //string output = "";
+            string output = "";
             foreach (intervalStruct interval in intervals)
             {
-                double t = (interval.x - xAverage) / Sd;
-                //output += t.ToString() + "\n";
-                int index = (int)Math.Abs(Math.Round(t * 100));
-                double fi = fiTable[index];
-                interval.theorFrequencies = data.Count * H * fi / Sd;
+                if (distribution == "normal")
+                {
+                    double t = (interval.x - xAverage) / Sd;
+                    //output += t.ToString() + "\n";
+                    int index = (int)Math.Abs(Math.Round(t * 100));
+                    double fi = fiTable[index];
+                    interval.theorFrequencies = data.Count * H * fi / Sd;
+                    output += interval.theorFrequencies + "\n";
+                }
+                else
+                // uniform
+                {
+                    interval.theorFrequencies = interval.sumFrequencies * (interval.endPoint - interval.startPoint) / (data.Max() - data.Min());
+                    output += interval.theorFrequencies + "\n";
+                }
             }
-            //MessageBox.Show(output);
+            MessageBox.Show(output, "Theoretical frequencies: " + distribution);
         }
 
         int CountDegreesOfFreedom()
@@ -391,6 +451,7 @@ namespace Stats.Controls
             {
                 message = "Pirson: Hypothesis has been accepted";
             }
+            message += "\nX2obs = " + X2obs + "; " + "X2da = " + X2da;
             return message;
         }
 
@@ -406,6 +467,7 @@ namespace Stats.Controls
             {
                 message = "Romanovsky: Hypothesis has been accepted";
             }
+            message += "\nR = " + R;
             return message;
         }
 
@@ -421,6 +483,7 @@ namespace Stats.Controls
             {
                 message = "Yastremsky: Hypothesis has been accepted";
             }
+            message += "\nJ = " + J;
             return message;
         }
 
@@ -455,7 +518,7 @@ namespace Stats.Controls
                 //sw.WriteLine("<table>");
                 foreach (intervalStruct interval in intervals)
                 {
-                    sw.WriteLine("{0} {1}-{2} {3} {4}", i, interval.startPoint, interval.endPoint, interval.sumFrequencies, interval.middle);
+                    sw.WriteLine("N: {0}  [{1} - {2}]  Сумма частот: {3}  Середина интервала: {4}", i, interval.startPoint, interval.endPoint, interval.sumFrequencies, interval.middle);
                     i++;
                 }
                 //sw.WriteLine("</table>");
